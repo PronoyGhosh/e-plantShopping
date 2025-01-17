@@ -1,36 +1,68 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { removeItem, updateQuantity } from './CartSlice';
+import { countTotalItems, removeItem, updateQuantity } from './CartSlice';
 import './CartItem.css';
 
 const CartItem = ({ onContinueShopping }) => {
-  const cart = useSelector(state => state.cart.items);
-  const dispatch = useDispatch();
+    const cart = useSelector(state => state.cart.items);
+    const dispatch = useDispatch();
 
-  // Calculate total amount for all products in the cart
-  const calculateTotalAmount = () => {
- 
-  };
+    // Calculate total amount for all products in the cart
+    const calculateTotalAmount = () => {
+        return cart.reduce((total, item) => {
+            const itemCost = parseCost(item.cost);
+            const itemQuantity = parseInt(item.quantity);
+      
+            // Check for valid numbers
+            if (isNaN(itemCost) || isNaN(itemQuantity)) {
+              console.error(`Invalid cost (${item.cost}) or quantity (${item.quantity}) for item ${item.name}`);
+              return total;
+            }
+            return total + (itemCost * itemQuantity);
+          }, 0).toFixed(2);
+    };
 
-  const handleContinueShopping = (e) => {
-   
-  };
+    const parseCost = (cost) => {
+        return parseFloat(cost.replace(/[^0-9.-]+/g, ''));
+    };
 
+    const handleIncrement = (item) => {
+        const itemToIncrement = { name: item.name, quantity: item.quantity+1}
+        dispatch(updateQuantity(itemToIncrement));
+        dispatch(countTotalItems());
+    };
 
+    const handleDecrement = (item) => {
+        const itemToDecrement = { name: item.name, quantity: item.quantity-1}
+        if (itemToDecrement.quantity === 0) {
+            dispatch(removeItem(item));
+        } else {
+            dispatch(updateQuantity(itemToDecrement));
+        }
+        dispatch(countTotalItems());
+    };
 
-  const handleIncrement = (item) => {
-  };
+    const handleRemove = (item) => {
+        dispatch(removeItem(item));
+        dispatch(countTotalItems());
+    };
 
-  const handleDecrement = (item) => {
-   
-  };
+    const handleCheckoutShopping = (e) => {
+        alert('Functionality to be added for future reference');
+    };
 
-  const handleRemove = (item) => {
-  };
+    // Calculate total cost based on quantity for an item
+    const calculateTotalCost = (item) => {
+        const itemCost = parseCost(item.cost);
+        const itemQuantity = parseInt(item.quantity);
 
-  // Calculate total cost based on quantity for an item
-  const calculateTotalCost = (item) => {
-  };
+        if (isNaN(itemCost) || isNaN(itemQuantity)) {
+        console.error(`Invalid cost (${item.cost}) or quantity (${item.quantity}) for item ${item.name}`);
+        return '0.00';
+        }
+
+        return (itemCost * itemQuantity).toFixed(2);
+    };
 
   return (
     <div className="cart-container">
