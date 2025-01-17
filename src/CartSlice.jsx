@@ -27,9 +27,16 @@ if (itemToUpdate) {
 
     
     },
+     countTotalItems: (state, action) => {
+        let total = 0;
+        state.items.map((countItem) => (
+            total += countItem.quantity
+        ))
+        state.totalItems = total;
+    },
   },
 });
 
-export const { addItem, removeItem, updateQuantity } = CartSlice.actions;
+export const { addItem, removeItem, updateQuantity, countTotalItems} = CartSlice.actions;
 
 export default CartSlice.reducer;
